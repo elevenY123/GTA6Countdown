@@ -141,4 +141,16 @@ extension WKWebView: MapWebControlling {
     func load(_ url: URL) {
         load(URLRequest(url: url))
     }
+
+    func navigateBack() {
+        goBack()
+    }
+
+    func navigateForward() {
+        goForward()
+    }
+
+    func reloadContent() {
+        reload()
+    }
 }

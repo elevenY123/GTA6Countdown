@@ -185,7 +185,7 @@ private final class MapWebControllerSpy: MapWebControlling {
     var canGoForward: Bool { canGoForwardValue }
 
     func load(_ url: URL) { loadedURLs.append(url) }
-    func goBack() { goBackCount += 1 }
-    func goForward() { goForwardCount += 1 }
-    func reload() { reloadCount += 1 }
+    func navigateBack() { goBackCount += 1 }
+    func navigateForward() { goForwardCount += 1 }
+    func reloadContent() { reloadCount += 1 }
 }

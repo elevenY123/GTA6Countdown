@@ -4,8 +4,15 @@ struct NewsListView: View {
     @StateObject private var viewModel: NewsViewModel
     @Binding private var deepLinkedArticleID: String?
 
+    @MainActor
+    init(deepLinkedArticleID: Binding<String?> = .constant(nil)) {
+        _viewModel = StateObject(wrappedValue: NewsViewModel())
+        _deepLinkedArticleID = deepLinkedArticleID
+    }
+
+    @MainActor
     init(
-        viewModel: @autoclosure @escaping () -> NewsViewModel = NewsViewModel(),
+        viewModel: @autoclosure @escaping () -> NewsViewModel,
         deepLinkedArticleID: Binding<String?> = .constant(nil)
     ) {
         _viewModel = StateObject(wrappedValue: viewModel())

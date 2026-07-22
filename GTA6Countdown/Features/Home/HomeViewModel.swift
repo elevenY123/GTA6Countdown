@@ -104,10 +104,18 @@ final class HomeViewModel: ObservableObject {
     private var isStarted = false
     private var isTicking = false
 
+    convenience init() {
+        self.init(
+            clock: SystemCountdownClock(),
+            ticker: SystemCountdownTicker(),
+            lifecycle: ApplicationHomeLifecycle()
+        )
+    }
+
     init(
-        clock: any CountdownClock = SystemCountdownClock(),
-        ticker: any CountdownTicking = SystemCountdownTicker(),
-        lifecycle: any HomeLifecycleObserving = ApplicationHomeLifecycle(),
+        clock: any CountdownClock,
+        ticker: any CountdownTicking,
+        lifecycle: any HomeLifecycleObserving,
         deviceCalendar: Calendar = .autoupdatingCurrent,
         releaseDateComponents: DateComponents = RemoteConfig.defaultReleaseDateComponents
     ) {

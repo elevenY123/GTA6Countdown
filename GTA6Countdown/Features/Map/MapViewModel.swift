@@ -44,9 +44,9 @@ protocol MapWebControlling: AnyObject {
     var canGoBack: Bool { get }
     var canGoForward: Bool { get }
     func load(_ url: URL)
-    func goBack()
-    func goForward()
-    func reload()
+    func navigateBack()
+    func navigateForward()
+    func reloadContent()
 }
 
 @MainActor
@@ -63,9 +63,13 @@ final class MapViewModel: ObservableObject {
     private let opener: MapExternalOpening
     private weak var controller: MapWebControlling?
 
+    convenience init() {
+        self.init(opener: SystemMapExternalOpener())
+    }
+
     init(
         policy: MapNavigationDeciding = MapNavigationPolicy(),
-        opener: MapExternalOpening = SystemMapExternalOpener()
+        opener: MapExternalOpening
     ) {
         self.policy = policy
         self.opener = opener
@@ -127,18 +131,18 @@ final class MapViewModel: ObservableObject {
 
     func goBack() {
         guard canGoBack else { return }
-        controller?.goBack()
+        controller?.navigateBack()
     }
 
     func goForward() {
         guard canGoForward else { return }
-        controller?.goForward()
+        controller?.navigateForward()
     }
 
     func refresh() {
         errorMessage = nil
         isLoading = true
-        controller?.reload()
+        controller?.reloadContent()
     }
 
     func retry() {

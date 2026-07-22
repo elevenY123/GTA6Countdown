@@ -143,7 +143,7 @@ actor WidgetCoverStore {
         maximumDiskSize: Int = 8 * 1_024 * 1_024,
         maximumAge: TimeInterval = 24 * 60 * 60,
         fileManager: FileManager = .default,
-        now: @escaping @Sendable () -> Date = Date.init
+        now: @escaping @Sendable () -> Date = { Date() }
     ) {
         let applicationSupport = fileManager.urls(
             for: .applicationSupportDirectory,

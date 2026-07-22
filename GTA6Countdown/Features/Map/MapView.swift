@@ -3,7 +3,13 @@ import SwiftUI
 struct MapView: View {
     @StateObject private var viewModel: MapViewModel
 
-    init(viewModel: @autoclosure @escaping () -> MapViewModel = MapViewModel()) {
+    @MainActor
+    init() {
+        _viewModel = StateObject(wrappedValue: MapViewModel())
+    }
+
+    @MainActor
+    init(viewModel: @autoclosure @escaping () -> MapViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel())
     }
 

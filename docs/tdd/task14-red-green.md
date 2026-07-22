@@ -23,3 +23,8 @@ The CI contract was extended after review to require the supported `macos-15`
 runner, explicit Xcode 16.4 selection/version output, and `push` builds limited
 to `main`. It failed against the initial workflow (`macos-14` and unrestricted
 push), then passed after those workflow fixes.
+
+The first real GitHub Actions run then failed before creating any jobs because
+job-level `env` cannot use the `runner` context. `actionlint` reproduced the
+failure at `DERIVED_DATA`; the contract now rejects that expression and the
+workflow uses an absolute runner-local temporary path instead.

@@ -6,7 +6,13 @@ struct HomeView: View {
     @StateObject private var viewModel: HomeViewModel
     @State private var isShowingAbout = false
 
-    init(viewModel: @autoclosure @escaping () -> HomeViewModel = HomeViewModel()) {
+    @MainActor
+    init() {
+        _viewModel = StateObject(wrappedValue: HomeViewModel())
+    }
+
+    @MainActor
+    init(viewModel: @autoclosure @escaping () -> HomeViewModel) {
         _viewModel = StateObject(wrappedValue: viewModel())
     }
 

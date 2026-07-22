@@ -24,6 +24,10 @@ assert(workflow.includes("runs-on: macos-15"), "iOS job must use the supported m
 assert(workflow.includes("sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer"),
   "iOS job must explicitly select Xcode 16.4");
 assert(workflow.includes("xcodebuild -version"), "iOS job must report the selected Xcode version");
+assert(workflow.includes("DERIVED_DATA: /tmp/GTA6CountdownDerivedData"),
+  "job-level DerivedData must use a context valid before runner allocation");
+assert(!/env:\s*\n\s+DERIVED_DATA:\s*\$\{\{\s*runner\.temp/.test(workflow),
+  "job-level env must not use the unavailable runner context");
 assert(workflow.includes("CODE_SIGNING_ALLOWED=NO"), "device build must not require distribution signing");
 assert(workflow.includes("scripts/package-ipa.sh") && workflow.includes("scripts/validate-ipa.sh"),
   "workflow must package and validate the IPA");
