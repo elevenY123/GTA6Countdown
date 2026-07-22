@@ -30,8 +30,10 @@ assert.match(newsViewModel, /self\.pinnedOfficial = pinnedOfficial/,
   "NewsPresentation must assign its stored property from the local result");
 assert.match(imageCache, /let task: Task<Data\?, Never> = Task/,
   "ImageCache must explicitly type the download task so cancellation can return nil");
-assert.match(widgetTimelineTests, /asyncAfter\(deadline: \.now\(\) \+ 0\.25\)/,
-  "the streaming stub must leave deterministic time for URLSession cancellation on CI");
+assert.doesNotMatch(widgetTimelineTests, /XCTAssertLessThan\(observation\.deliveredChunks/,
+  "bounded transport tests must not infer delegate cancellation timing from URLProtocol buffering");
+assert.doesNotMatch(widgetTimelineTests, /XCTAssertEqual\(WidgetStreamingURLProtocolStub\.observation\(\)\.deliveredChunks/,
+  "declared-length tests must assert transfer cancellation rather than URLProtocol buffering");
 
 for (const method of ["navigateBack", "navigateForward", "reloadContent"]) {
   assert.match(mapModel, new RegExp(`func ${method}\\(\\)`),

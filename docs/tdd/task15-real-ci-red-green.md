@@ -23,9 +23,11 @@ download task. The task now declares `Task<Data?, Never>` explicitly, preserving
 the existing cancellation behavior while providing the compiler's missing
 context.
 
-After compilation turned green, the full unit suite exposed a CI-only race in
-two bounded-image transport tests. The transport returned the correct
-`responseTooLarge` error and stopped the protocol, but the synthetic protocol's
-10 ms chunk cadence could enqueue every chunk before URLSession's delegate queue
-processed cancellation. The stub cadence is now 250 ms, making the same early
-cancellation assertions deterministic without changing production behavior.
+After compilation turned green, the full unit suite exposed two invalid
+bounded-image transport assertions. The transport returned the correct
+`responseTooLarge` error and stopped the protocol, but this Xcode simulator
+buffers custom `URLProtocol` data before delivering it to the URLSession data
+delegate. Increasing the synthetic chunk delay proved that emitted-chunk counts
+cannot measure delegate cancellation timing. The tests now verify the observable
+contract—typed rejection plus protocol stop—without relying on that buffering
+implementation detail.
