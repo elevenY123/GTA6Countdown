@@ -193,7 +193,7 @@ actor ImageCache {
         let session = self.session
         let limiter = self.limiter
         let maximumResponseSize = self.maximumResponseSize
-        let task = Task {
+        let task: Task<Data?, Never> = Task {
             guard await limiter.acquire() else { return nil }
             let data = await Self.download(
                 url: url,

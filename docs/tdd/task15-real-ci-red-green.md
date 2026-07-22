@@ -16,3 +16,9 @@ definite-initialization error in `NewsPresentation`: a filtering closure read a
 stored property before `articles` was initialized. The pinned article is now
 computed in a local constant and assigned before the remaining article list is
 built.
+
+The third compiler run reached `ImageCache` and found that Swift 6 could not
+infer the optional result type for the cancellation branch of its unannotated
+download task. The task now declares `Task<Data?, Never>` explicitly, preserving
+the existing cancellation behavior while providing the compiler's missing
+context.
