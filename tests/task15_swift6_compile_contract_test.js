@@ -10,6 +10,7 @@ const mapView = read("GTA6Countdown/Features/Map/MapView.swift");
 const mapModel = read("GTA6Countdown/Features/Map/MapViewModel.swift");
 const mapWebView = read("GTA6Countdown/Features/Map/MapWebView.swift");
 const newsView = read("GTA6Countdown/Features/News/NewsListView.swift");
+const newsViewModel = read("GTA6Countdown/Features/News/NewsViewModel.swift");
 
 assert.doesNotMatch(homeView, /=\s*HomeViewModel\(\)/,
   "HomeView must not instantiate a main-actor model in a default argument");
@@ -21,6 +22,10 @@ assert.doesNotMatch(homeModel, /ticker:.*=\s*SystemCountdownTicker\(\)/,
   "HomeViewModel must construct actor-isolated dependencies inside its convenience initializer");
 assert.doesNotMatch(mapModel, /opener:.*=\s*SystemMapExternalOpener\(\)/,
   "MapViewModel must construct its system opener inside its convenience initializer");
+assert.match(newsViewModel, /let pinnedOfficial = articles\.first/,
+  "NewsPresentation must compute pinnedOfficial without capturing partially initialized self");
+assert.match(newsViewModel, /self\.pinnedOfficial = pinnedOfficial/,
+  "NewsPresentation must assign its stored property from the local result");
 
 for (const method of ["navigateBack", "navigateForward", "reloadContent"]) {
   assert.match(mapModel, new RegExp(`func ${method}\\(\\)`),

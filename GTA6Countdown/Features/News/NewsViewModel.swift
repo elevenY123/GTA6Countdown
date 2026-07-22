@@ -6,12 +6,13 @@ struct NewsPresentation: Equatable {
     let articles: [NewsArticle]
 
     init(articles: [NewsArticle], pinnedOfficialArticleID: String?) {
-        pinnedOfficial = articles.first { article in
+        let pinnedOfficial = articles.first { article in
             article.id == pinnedOfficialArticleID
                 && article.isPinned
                 && article.isOfficial
                 && article.credibility == .official
         }
+        self.pinnedOfficial = pinnedOfficial
         let pinnedTopicKey = pinnedOfficial.map { Self.normalizedTopicKey($0.canonicalTopicKey) }
         let eligible = articles.filter { article in
             article.id != pinnedOfficial?.id
