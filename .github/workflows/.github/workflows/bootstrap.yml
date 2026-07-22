@@ -1,0 +1,28 @@
+name: Bootstrap project
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/bootstrap.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  expand-project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Expand complete project
+        run: |
+          mkdir -p "$RUNNER_TEMP/project"
+          unzip -q GTA6Countdown-source-8746da5.zip -d "$RUNNER_TEMP/project"
+          rsync -a --delete --exclude='.git/' "$RUNNER_TEMP/project/" ./
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: publish GTA VI Countdown app"
+          git push origin HEAD:main
