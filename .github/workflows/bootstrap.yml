@@ -1,4 +1,4 @@
-name: Bootstrap project
+name: Apply Xcode fix
 
 on:
   push:
@@ -11,24 +11,17 @@ permissions:
   contents: write
 
 jobs:
-  expand-project:
+  apply-fix:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Expand complete project
+      - name: Apply Xcode compile fix
         run: |
-          rm -rf "$RUNNER_TEMP/project"
-          mkdir -p "$RUNNER_TEMP/project"
-          unzip -q GTA6Countdown-source-8746da5.zip -d "$RUNNER_TEMP/project"
-          rsync -a --delete \
-            --exclude='.git/' \
-            --exclude='.github/workflows/***' \
-            "$RUNNER_TEMP/project/" ./
-          cp "$RUNNER_TEMP/project/.github/workflows/build-and-test.yml" \
-            build-and-test.yml.template
+          unzip -oq GTA6Countdown-xcode-fix-d553535.zip -d .
+          rm -f GTA6Countdown-xcode-fix-d553535.zip
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "feat: publish GTA VI Countdown app"
+          git commit -m "fix: satisfy Xcode 16 actor isolation"
           git push origin HEAD:main
