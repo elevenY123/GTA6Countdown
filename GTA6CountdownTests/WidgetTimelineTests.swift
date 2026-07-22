@@ -546,7 +546,11 @@ private final class WidgetStreamingURLProtocolStub: URLProtocol {
     }
 
     private func sendChunk(at index: Int) {
-        DispatchQueue.global().asyncAfter(deadline: .now() + 0.01) { [self] in
+        // Leave enough time for URLSession's delegate queue to process the
+        // response disposition or overflow cancellation before the stub emits
+        // another chunk. A 10 ms gap is shorter than a loaded CI simulator's
+        // scheduling latency and makes the cancellation assertion racy.
+        DispatchQueue.global().asyncAfter(deadline: .now() + 0.25) { [self] in
             Self.lock.lock()
             guard !stopped, index < Self.chunks.count else {
                 Self.lock.unlock()

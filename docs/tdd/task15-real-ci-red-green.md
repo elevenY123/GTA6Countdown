@@ -22,3 +22,10 @@ infer the optional result type for the cancellation branch of its unannotated
 download task. The task now declares `Task<Data?, Never>` explicitly, preserving
 the existing cancellation behavior while providing the compiler's missing
 context.
+
+After compilation turned green, the full unit suite exposed a CI-only race in
+two bounded-image transport tests. The transport returned the correct
+`responseTooLarge` error and stopped the protocol, but the synthetic protocol's
+10 ms chunk cadence could enqueue every chunk before URLSession's delegate queue
+processed cancellation. The stub cadence is now 250 ms, making the same early
+cancellation assertions deterministic without changing production behavior.
