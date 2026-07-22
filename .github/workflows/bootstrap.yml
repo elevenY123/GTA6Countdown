@@ -18,10 +18,10 @@ jobs:
 
       - name: Apply Xcode compile fix
         run: |
-          unzip -oq GTA6Countdown-test-fix5-e80aec5.zip -d .
-          rm -f GTA6Countdown-test-fix5-e80aec5.zip
+          unzip -oq GTA6Countdown-ui-fix6-5820623.zip -d .
+          rm -f GTA6Countdown-ui-fix6-5820623.zip
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "test: assert bounded transport observables"
+          git commit -m "test: query native iOS tab accessibility"
           git push origin HEAD:main
