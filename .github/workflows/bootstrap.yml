@@ -18,10 +18,10 @@ jobs:
 
       - name: Apply Xcode compile fix
         run: |
-          unzip -oq GTA6Countdown-xcode-fix2-59f933c.zip -d .
-          rm -f GTA6Countdown-xcode-fix2-59f933c.zip
+          unzip -oq GTA6Countdown-xcode-fix3-76e9011.zip -d .
+          rm -f GTA6Countdown-xcode-fix3-76e9011.zip
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
-          git commit -m "fix: satisfy Xcode 16 actor isolation"
+          git commit -m "fix: type image download task explicitly"
           git push origin HEAD:main
