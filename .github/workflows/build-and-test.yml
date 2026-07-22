@@ -61,7 +61,7 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 45
     env:
-      DERIVED_DATA: ${{ runner.temp }}/GTA6CountdownDerivedData
+      DERIVED_DATA: /tmp/GTA6CountdownDerivedData
     steps:
       - uses: actions/checkout@v4
 
