@@ -18,9 +18,15 @@ jobs:
 
       - name: Expand complete project
         run: |
+          rm -rf "$RUNNER_TEMP/project"
           mkdir -p "$RUNNER_TEMP/project"
           unzip -q GTA6Countdown-source-8746da5.zip -d "$RUNNER_TEMP/project"
-          rsync -a --delete --exclude='.git/' "$RUNNER_TEMP/project/" ./
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/workflows/***' \
+            "$RUNNER_TEMP/project/" ./
+          cp "$RUNNER_TEMP/project/.github/workflows/build-and-test.yml" \
+            build-and-test.yml.template
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
