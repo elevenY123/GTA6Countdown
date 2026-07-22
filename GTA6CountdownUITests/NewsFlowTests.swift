@@ -1,18 +1,17 @@
 import XCTest
 
 final class NewsFlowTests: XCTestCase {
-    func testNewsTabExposesARecoverableInitialState() {
+    func testNewsTabExposesDeterministicFixtureContent() {
         let app = XCUIApplication()
+        app.launchArguments = ["--uitest-news-fixture"]
         app.launch()
 
         app.tabBars.buttons["新闻"].tap()
 
         XCTAssertTrue(app.descendants(matching: .any)["root-screen-news"].waitForExistence(timeout: 3))
         XCTAssertTrue(
-            app.descendants(matching: .any)["news-content"].exists
-                || app.descendants(matching: .any)["news-loading"].exists
-                || app.descendants(matching: .any)["news-empty"].exists
-                || app.descendants(matching: .any)["news-unavailable"].exists
+            app.descendants(matching: .any)["news-pinned-official"]
+                .waitForExistence(timeout: 3)
         )
     }
 

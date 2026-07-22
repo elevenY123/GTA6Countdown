@@ -13,6 +13,8 @@ const newsView = read("GTA6Countdown/Features/News/NewsListView.swift");
 const newsViewModel = read("GTA6Countdown/Features/News/NewsViewModel.swift");
 const imageCache = read("GTA6Countdown/Services/ImageCache.swift");
 const widgetTimelineTests = read("GTA6CountdownTests/WidgetTimelineTests.swift");
+const rootNavigationTests = read("GTA6CountdownUITests/RootNavigationTests.swift");
+const newsFlowTests = read("GTA6CountdownUITests/NewsFlowTests.swift");
 
 assert.doesNotMatch(homeView, /=\s*HomeViewModel\(\)/,
   "HomeView must not instantiate a main-actor model in a default argument");
@@ -34,6 +36,12 @@ assert.doesNotMatch(widgetTimelineTests, /XCTAssertLessThan\(observation\.delive
   "bounded transport tests must not infer delegate cancellation timing from URLProtocol buffering");
 assert.doesNotMatch(widgetTimelineTests, /XCTAssertEqual\(WidgetStreamingURLProtocolStub\.observation\(\)\.deliveredChunks/,
   "declared-length tests must assert transfer cancellation rather than URLProtocol buffering");
+for (const label of ["主页", "新闻", "地图"]) {
+  assert.match(rootNavigationTests, new RegExp(`app\\.tabBars\\.buttons\\["${label}"\\]`),
+    `root UI tests must query the native tab button labelled ${label}`);
+}
+assert.match(newsFlowTests, /testNewsTabExposesDeterministicFixtureContent[\s\S]*--uitest-news-fixture/,
+  "news UI state tests must use deterministic bundled content");
 
 for (const method of ["navigateBack", "navigateForward", "reloadContent"]) {
   assert.match(mapModel, new RegExp(`func ${method}\\(\\)`),

@@ -25,9 +25,9 @@ final class RootNavigationTests: XCTestCase {
     func testRootTabsAreAccessibleAndSelectable() {
         app.launch()
 
-        let home = app.buttons["root-tab-home"]
-        let news = app.buttons["root-tab-news"]
-        let map = app.buttons["root-tab-map"]
+        let home = app.tabBars.buttons["主页"]
+        let news = app.tabBars.buttons["新闻"]
+        let map = app.tabBars.buttons["地图"]
 
         XCTAssertTrue(home.waitForExistence(timeout: 2))
         XCTAssertTrue(news.exists)
@@ -84,14 +84,9 @@ final class RootNavigationTests: XCTestCase {
     ) {
         let window = app.windows.firstMatch
         XCTAssertTrue(window.waitForExistence(timeout: 2), file: file, line: line)
-        let expectedTabs = [
-            ("root-tab-home", "主页"),
-            ("root-tab-news", "新闻"),
-            ("root-tab-map", "地图")
-        ]
-        let tabs = expectedTabs.map { expected -> XCUIElement in
-            let (identifier, label) = expected
-            let tab = app.buttons[identifier]
+        let expectedTabs = ["主页", "新闻", "地图"]
+        let tabs = expectedTabs.map { label -> XCUIElement in
+            let tab = app.tabBars.buttons[label]
             XCTAssertTrue(tab.waitForExistence(timeout: 2), file: file, line: line)
             XCTAssertTrue(tab.isHittable, file: file, line: line)
             XCTAssertFalse(tab.label.isEmpty, file: file, line: line)

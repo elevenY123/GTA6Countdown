@@ -31,3 +31,11 @@ delegate. Increasing the synthetic chunk delay proved that emitted-chunk counts
 cannot measure delegate cancellation timing. The tests now verify the observable
 contract—typed rejection plus protocol stop—without relying on that buffering
 implementation detail.
+
+The first complete unit-test GREEN then reached UI tests. The pinned-news flow
+passed, proving the app launched and navigation worked, while four assertions
+queried unstable SwiftUI container identifiers. Native iOS 16 tab buttons are
+exposed to XCTest by their visible Chinese labels, and an unconfigured live
+news endpoint cannot provide a deterministic initial state. Root navigation
+tests now query `TabBar` buttons by those user-visible labels, and the news
+state test uses the same bundled fixture that already passed the detail flow.
