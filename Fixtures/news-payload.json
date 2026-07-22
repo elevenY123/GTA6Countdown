@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-07-20T00:00:00Z",
+  "remoteConfig": {
+    "releaseDate": "2026-11-19",
+    "releaseTimeMode": "localMidnight",
+    "milestoneMessages": {
+      "100": "最后一百天，正式开始。"
+    },
+    "pinnedOfficialArticleID": "rockstar-1",
+    "lastUpdatedAt": "2026-07-20T00:00:00Z",
+    "schemaVersion": 1,
+    "futureConfigField": true
+  },
+  "articles": [
+    {
+      "id": "rockstar-1",
+      "title": "《侠盗猎车手 VI》最新消息",
+      "summary": "来自 Rockstar Games 的官方更新。",
+      "sourceName": "Rockstar Games",
+      "sourceURL": "https://www.rockstargames.com/zh/newswire",
+      "publishedAt": "2026-07-19T12:00:00Z",
+      "imageURL": "https://media.rockstargames.com/example.jpg",
+      "credibility": "official",
+      "isOfficial": true,
+      "isPinned": true,
+      "relatedSourceCount": 3,
+      "canonicalTopicKey": "official-update",
+      "futureArticleField": "ignored"
+    },
+    {
+      "id": "media-1",
+      "title": "中文媒体分析 GTA VI 新细节",
+      "summary": "媒体对公开素材进行了分析。",
+      "sourceName": "示例游戏媒体",
+      "sourceURL": "https://example.com/gta-vi-news",
+      "publishedAt": "2026-07-19T10:00:00+08:00",
+      "imageURL": null,
+      "credibility": "media",
+      "isOfficial": false,
+      "isPinned": false,
+      "relatedSourceCount": 0,
+      "canonicalTopicKey": "trailer-analysis"
+    }
+  ],
+  "futurePayloadField": {
+    "version": 2
+  }
+}

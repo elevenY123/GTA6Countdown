@@ -1,0 +1,20 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gta-vi-countdown-feed",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-07-20",
+  "workers_dev": true,
+  "kv_namespaces": [
+    {
+      "binding": "NEWS_KV",
+      "id": "REPLACE_WITH_PRODUCTION_KV_ID",
+      "preview_id": "REPLACE_WITH_PREVIEW_KV_ID"
+    }
+  ],
+  "triggers": {
+    "crons": ["0 * * * *"]
+  },
+  "observability": {
+    "enabled": false
+  }
+}

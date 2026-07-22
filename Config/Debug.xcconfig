@@ -1,0 +1,2 @@
+API_BASE_URL = https:/$()/debug-api.example.invalid/v1/feed
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG

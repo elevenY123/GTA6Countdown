@@ -1,0 +1,191 @@
+name: Build, test, and package
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gta6-countdown-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-and-contracts:
+    name: Backend and package contracts (Linux)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install asset validation tools
+        run: sudo apt-get update && sudo apt-get install --yes imagemagick ripgrep
+
+      - name: Run project and IPA contracts
+        run: |
+          bash tests/project_structure_test.sh
+          node tests/countdown_source_contract_test.js
+          node tests/news_cache_contract_test.js
+          node tests/task4_services_contract_test.js
+          node tests/task7_news_presentation_contract_test.js
+          node tests/task8_map_contract_test.js
+          node tests/task9_widget_contract_test.js
+          node tests/task13_assets_about_contract_test.js
+          node tests/task14_ci_contract_test.js
+          bash tests/task14_ipa_contract_test.sh
+          bash scripts/validate-assets.sh
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Test and type-check backend
+        working-directory: backend
+        run: |
+          npm test
+          npm run typecheck
+          npm audit --audit-level=high
+
+  ios-build-test-package:
+    name: iOS tests and TrollStore IPA (macOS)
+    needs: backend-and-contracts
+    runs-on: macos-15
+    timeout-minutes: 45
+    env:
+      DERIVED_DATA: ${{ runner.temp }}/GTA6CountdownDerivedData
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select supported Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Configure news endpoint
+        env:
+          CONFIGURED_API_BASE_URL: ${{ vars.API_BASE_URL }}
+        run: |
+          endpoint="$CONFIGURED_API_BASE_URL"
+          if [ -z "$endpoint" ]; then
+            endpoint='https://api.example.invalid/v1/feed'
+            echo 'API_BASE_URL is not configured; tests remain deterministic, but installed online news will be unavailable.'
+          fi
+          case "$endpoint" in
+            https://*/v1/feed) ;;
+            *) echo 'API_BASE_URL must be an HTTPS URL ending in /v1/feed' >&2; exit 1 ;;
+          esac
+          echo "API_BASE_URL=$endpoint" >> "$GITHUB_ENV"
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Select an available iPhone simulator
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import subprocess
+
+          devices = json.loads(subprocess.check_output(
+              ["xcrun", "simctl", "list", "devices", "available", "-j"], text=True
+          ))["devices"]
+          candidates = [
+              (runtime, device)
+              for runtime, runtime_devices in devices.items()
+              for device in runtime_devices
+              if device.get("isAvailable") and "iPhone" in device.get("name", "")
+          ]
+          if not candidates:
+              raise SystemExit("No available iPhone simulator was found")
+          _, selected = max(candidates, key=lambda item: item[0])
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as environment:
+              environment.write(f"SIMULATOR_UDID={selected['udid']}\n")
+          print(f"Selected {selected['name']} ({selected['udid']})")
+          PY
+
+      - name: Boot simulator
+        run: |
+          xcrun simctl boot "$SIMULATOR_UDID" 2>/dev/null || true
+          xcrun simctl bootstatus "$SIMULATOR_UDID" -b
+
+      - name: Build for Simulator
+        run: |
+          xcodebuild build \
+            -project GTA6Countdown.xcodeproj \
+            -scheme GTA6Countdown \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
+            -derivedDataPath "$DERIVED_DATA" \
+            "API_BASE_URL=$API_BASE_URL" \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Run unit tests
+        run: |
+          xcodebuild test \
+            -project GTA6Countdown.xcodeproj \
+            -scheme GTA6Countdown \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
+            -derivedDataPath "$DERIVED_DATA" \
+            -only-testing:GTA6CountdownTests \
+            "API_BASE_URL=$API_BASE_URL" \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Run UI tests
+        run: |
+          mkdir -p TestResults
+          xcodebuild test \
+            -project GTA6Countdown.xcodeproj \
+            -scheme GTA6Countdown \
+            -destination "platform=iOS Simulator,id=$SIMULATOR_UDID" \
+            -derivedDataPath "$DERIVED_DATA" \
+            -only-testing:GTA6CountdownUITests \
+            -resultBundlePath TestResults/GTA6CountdownUITests.xcresult \
+            "API_BASE_URL=$API_BASE_URL" \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Build Release app for iPhone
+        run: |
+          xcodebuild build \
+            -project GTA6Countdown.xcodeproj \
+            -scheme GTA6Countdown \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$DERIVED_DATA" \
+            "API_BASE_URL=$API_BASE_URL" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+      - name: Package and validate TrollStore IPA
+        run: |
+          scripts/package-ipa.sh \
+            "$DERIVED_DATA/Build/Products/Release-iphoneos/GTA6Countdown.app" \
+            "$RUNNER_TEMP/GTA6Countdown-TrollStore.ipa"
+          scripts/validate-ipa.sh "$RUNNER_TEMP/GTA6Countdown-TrollStore.ipa"
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: GTA6Countdown-TrollStore
+          path: ${{ runner.temp }}/GTA6Countdown-TrollStore.ipa
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload UI test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: GTA6CountdownUITests-xcresult
+          path: TestResults/GTA6CountdownUITests.xcresult
+          if-no-files-found: warn
+          retention-days: 14

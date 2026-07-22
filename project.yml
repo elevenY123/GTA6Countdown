@@ -1,0 +1,118 @@
+name: GTA6Countdown
+
+options:
+  bundleIdPrefix: com.jaysuen
+  deploymentTarget:
+    iOS: "16.0"
+  xcodeVersion: "15.0"
+
+configs:
+  Debug: debug
+  Release: release
+
+configFiles:
+  Debug: Config/Debug.xcconfig
+  Release: Config/Release.xcconfig
+
+settings:
+  base:
+    SWIFT_VERSION: 5.9
+    IPHONEOS_DEPLOYMENT_TARGET: 16.0
+    CURRENT_PROJECT_VERSION: 1
+    MARKETING_VERSION: 1.0.0
+
+targets:
+  GTA6Countdown:
+    type: application
+    platform: iOS
+    sources:
+      - path: GTA6Countdown
+      - path: Fixtures/news-payload.json
+        buildPhase: resources
+    dependencies:
+      - target: GTA6CountdownWidget
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jaysuen.gta6countdown
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_API_BASE_URL: "$(API_BASE_URL)"
+        TARGETED_DEVICE_FAMILY: "1"
+    entitlements:
+      path: GTA6Countdown/GTA6Countdown.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.jaysuen.gta6countdown
+    info:
+      path: GTA6Countdown/Info.plist
+      properties:
+        CFBundleDisplayName: GTA VI 倒计时
+        CFBundleURLTypes:
+          - CFBundleURLName: com.jaysuen.gta6countdown.news
+            CFBundleURLSchemes:
+              - gta6countdown
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+
+  GTA6CountdownWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: GTA6CountdownWidgets
+      - path: GTA6Countdown/Shared
+      - path: GTA6Countdown/Services/NewsAPIClient.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jaysuen.gta6countdown.widget
+        SKIP_INSTALL: true
+        INFOPLIST_KEY_API_BASE_URL: "$(API_BASE_URL)"
+    entitlements:
+      path: GTA6CountdownWidgets/GTA6CountdownWidgets.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.jaysuen.gta6countdown
+    info:
+      path: GTA6CountdownWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: GTA VI 倒计时
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+
+  GTA6CountdownTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: GTA6CountdownTests
+    dependencies:
+      - target: GTA6Countdown
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jaysuen.gta6countdown.tests
+        GENERATE_INFOPLIST_FILE: true
+
+  GTA6CountdownUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: GTA6CountdownUITests
+    dependencies:
+      - target: GTA6Countdown
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.jaysuen.gta6countdown.uitests
+        GENERATE_INFOPLIST_FILE: true
+        TEST_TARGET_NAME: GTA6Countdown
+
+schemes:
+  GTA6Countdown:
+    build:
+      targets:
+        GTA6Countdown: all
+        GTA6CountdownWidget: all
+        GTA6CountdownTests: [test]
+        GTA6CountdownUITests: [test]
+    test:
+      targets:
+        - GTA6CountdownTests
+        - GTA6CountdownUITests

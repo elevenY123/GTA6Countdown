@@ -1,0 +1,8 @@
+{
+  "images" : [
+    { "filename" : "HeroDark@1x.jpg", "idiom" : "universal", "scale" : "1x" },
+    { "filename" : "HeroDark@2x.jpg", "idiom" : "universal", "scale" : "2x" },
+    { "filename" : "HeroDark@3x.jpg", "idiom" : "universal", "scale" : "3x" }
+  ],
+  "info" : { "author" : "xcode", "version" : 1 }
+}

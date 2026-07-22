@@ -1,0 +1,2 @@
+import { createJSONLDAdapter } from "./jsonLDAdapter";
+export const rockstarAdapter = createJSONLDAdapter({ id: "rockstar-newswire", kind: "officialCandidate", sourceName: "Rockstar Games", url: "https://www.rockstargames.com/zh/newswire?tag_id=666", baseURL: "https://www.rockstargames.com/zh/", trustedHosts: ["rockstargames.com"], imageHosts: ["rockstargames.com", "akamaized.net"], articlePathPattern: /^\/zh\/newswire\/article\/[a-z0-9]+\//u });
